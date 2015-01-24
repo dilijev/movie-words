@@ -5,17 +5,15 @@ public class SourceDataFormat {
 			subActualCD, subSumCD, subFormat, movieName, movieYear,
 			movieImdbID, userRank, subDownloadsCnt;
 
-	public static String titleRow;
+	public final String titleRow = "MovieID,IDSubtitleFile,SubLanguageID,IDSubtitle,SubActualCD,SubSumCD,SubFormat,"
+			+ "MovieName,MovieYear,MovieImdbID,UserRank,SubDownloadsCnt";
 
-	static {
-		titleRow = "MovieID,IDSubtitleFile,SubLanguageID,IDSubtitle,SubActualCD,SubSumCD,SubFormat,"
-				+ "MovieName,MovieYear,MovieImdbID,UserRank,SubDownloadsCnt"
-						.split(",");
+	public SourceDataFormat() {
 	}
 
 	public SourceDataFormat(String data) {
 		String[] fields = CSVParser.parse(data);
-		System.out.println(Arrays.toString(fields));
+//		System.out.println(Arrays.toString(fields));
 
 		movieID = fields[0];
 		idSubtitleFile = fields[1];
@@ -24,7 +22,7 @@ public class SourceDataFormat {
 		subActualCD = fields[4];
 		subSumCD = fields[5];
 		subFormat = fields[6];
-		movieName = fields[7];
+		movieName = fields[7].trim();
 		movieYear = fields[8];
 		movieImdbID = fields[9];
 		userRank = fields[10];
