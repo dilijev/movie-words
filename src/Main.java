@@ -1,3 +1,8 @@
+/*
+ * Author: Doug Ilijev
+ * Copyright (c) 2015: Doug Ilijev
+ */
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

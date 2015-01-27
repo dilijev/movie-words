@@ -1,3 +1,8 @@
+/*
+ * Author: Doug Ilijev
+ * Copyright (c) 2015: Doug Ilijev
+ */
+
 import java.util.Arrays;
 
 public class DestDataFormat extends SourceDataFormat {
