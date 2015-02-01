@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
+import com.github.dilijev.moviewords.imdb.ImdbScraper;
+
 public class Main {
 	public static void testCSV() throws FileNotFoundException {
 		Scanner sc = new Scanner(new File("E:\\dev\\movie-words\\source.csv"));
@@ -44,6 +46,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException {
-		
+		System.out.println(ImdbScraper.byImdbId(137523));
+		System.out.println(ImdbScraper.byImdbId(120737));
 	}
 }
