@@ -3,6 +3,8 @@
  * Copyright (c) 2015: Doug Ilijev
  */
 
+package com.github.dilijev.moviewords;
+
 import java.util.Comparator;
 
 public class SourceDataTitleOrder implements Comparator<SourceDataFormat> {

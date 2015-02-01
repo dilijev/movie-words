@@ -3,14 +3,17 @@
  * Copyright (c) 2015: Doug Ilijev
  */
 
+package com.github.dilijev.moviewords;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void testCSV() throws FileNotFoundException {
 		Scanner sc = new Scanner(new File("E:\\dev\\movie-words\\source.csv"));
 		sc.nextLine(); // throw away title line
 
@@ -38,5 +41,9 @@ public class Main {
 		for (DestDataFormat f : list) {
 			System.out.println(f.movieName);
 		}
+	}
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		
 	}
 }
