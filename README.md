@@ -44,4 +44,4 @@ We depend on the following packages:
 
 * [jsoup](http://jsoup.org/)
 
-For details about which versions we currently depend on, see [pom.xml](https://github.com/colestew/mercurydb/blob/master/pom.xml).
+For details about which versions we currently depend on, see [pom.xml](https://github.com/dilijev/movie-words/blob/master/pom.xml).
