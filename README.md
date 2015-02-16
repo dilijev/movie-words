@@ -31,7 +31,7 @@ mvn compile assembly:single
 You can run _MovieWords_ from the `.jar` built above by changing to the `target` directory and running a command like the following:
 
 ```bash
-java -jar mercurydb.jar <source_package_dir> <output_dir>
+java -jar movie-words.jar <source_package_dir> <output_dir>
 ```
 
 ### Requirements
