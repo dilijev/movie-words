@@ -43,7 +43,7 @@ public class SubtitleReader {
 				break;
 			}
 
-			cue.append(cueLine);
+			cue.append(cueLine.trim());
 			cue.append(" ");
 		} while (!cueLine.trim().isEmpty());
 
