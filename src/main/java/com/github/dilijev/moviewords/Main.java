@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.github.dilijev.moviewords.imdb.ImdbScraper;
@@ -56,17 +58,101 @@ public class Main {
 	public static void testImdbScraper() {
 		System.out.println(ImdbScraper.byImdbId(137523)); // Fight Club
 		System.out.println(ImdbScraper.byImdbId(120737)); // LOTR: Fellowship
-		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) -- TODO not working
+		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) -- TODO not working (TV mode)
 	}
 	
-	public static void main(String[] args) throws IOException {
-		if (args.length == 0) {
-			usage();
-			return;
+	public static void histogramMode(String[] args) throws IOException {
+		Map<String, String> opts = new HashMap<>();
+		
+		// TODO check that there is at least 1 arg after 0
+		// might as well check for 2 more because of the way the interface looks 
+		
+		// 0 was the verb that got us here, start at 1
+		for (int i = 1; i < args.length; i+=2) {
+			if (args[i].startsWith("-")) {
+				String key = args[i];
+				
+				if (i < args.length + 1) {
+					String value = args[i+1];
+					opts.put(key, value);
+				} else {
+					System.err.println("No value given for option: " + key);
+				}
+			} else {
+				System.err.println("Invalid argument: " + args[i]);
+				System.exit(1);
+			}
 		}
 		
-		String filename = args[0];
+		String filename = null; // -f
+		String sourceFile = null; // -s
+		int begin = 0; // -b : default 0 start at the beginning
+		int end = 0; // -e : default 0 do the whole file, otherwise stop on this line
 		
+		if (opts.containsKey("-s")) {
+			sourceFile = opts.get("-s");
+		} 
+		if (opts.containsKey("-f")) {
+			filename = opts.get("-f");
+		}
+		if (opts.containsKey("-b")) {
+			begin = Integer.parseInt(opts.get("-b"));
+		}
+		if (opts.containsKey("-e")) {
+			end = Integer.parseInt(opts.get("-e"));
+		}
+		
+		System.out.println("--Options--");
+		System.out.println("Filename: " + filename);
+		System.out.println("Source file: " + sourceFile);
+		System.out.println("Begin: " + begin);
+		System.out.println("End: " + end);
+		
+		if (filename == null && sourceFile == null) {
+			System.err.println("Must specify either -s or -f with histogram mode.");
+			System.exit(1);
+		}
+		
+		if (filename != null) {
+			// then do just this file
+			histogramHelper(filename);
+		} else {
+			// use the rest of the settings for a batch job
+			InputStream s = new FileInputStream(sourceFile);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(s));
+			
+			reader.readLine(); // skip the headers
+			
+			// just read up to the lines we care about (starting at line <begin>)
+			for (int i = 0; i < begin; i++) {
+				String line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+			}
+			
+			// read lines [begin..end)
+			for (int i = begin; (end == 0) ? true : (i < end); i++) {
+				String row = reader.readLine();
+				if (row == null) {
+					break;
+				}
+				
+				String[] entries = row.split(",");
+				
+				// IDSubtitleFile
+				// TODO set the relative path from a command line argument
+				String subtitleFilename = "eng" + File.separatorChar + entries[1];
+				
+				System.out.print("Subtitle file: ");
+				System.out.println(subtitleFilename);
+				
+				histogramHelper(subtitleFilename);
+			}
+		}	
+	}
+	
+	private static void histogramHelper(String filename) throws IOException {
 		Histogram h = new Histogram();
 		InputStream s = new FileInputStream(filename);
 		BufferedReader br = new BufferedReader(new InputStreamReader(s));
@@ -86,9 +172,25 @@ public class Main {
 		wordsCues.write(h.makeHistogramTable(true));
 		wordsCues.close();
 		
-		FileWriter all = new FileWriter(filename + ".all.csv");
-		all.write(h.toString());
-		all.close();
+//		FileWriter all = new FileWriter(filename + ".all.csv");
+//		all.write(h.toString());
+//		all.close();
+	}
+	
+	public static void main(String[] args) throws IOException {
+		if (args.length == 0) {
+			usage();
+			return;
+		}
+		
+		if (args.length >= 1) {
+			if (args[0].equals("histogram")) {
+				histogramMode(args);
+			} else {
+				System.err.println("Unknown mode.");
+				System.exit(1);
+			}
+		}
 	}
 	
 	public static void usage() {

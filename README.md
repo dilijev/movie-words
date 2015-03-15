@@ -31,7 +31,13 @@ mvn compile assembly:single
 You can run _MovieWords_ from the `.jar` built above by changing to the `target` directory and running a command like the following:
 
 ```bash
-java -jar movie-words.jar <source_package_dir> <output_dir>
+java -jar movie-words.jar <action> <options...>
+```
+
+Or if you add the `.jar` to the `CLASSPATH` you can run it as follows:
+
+```bash
+java com.github.dilijev.moviewords.Main <action> <options...>
 ```
 
 ### Requirements
