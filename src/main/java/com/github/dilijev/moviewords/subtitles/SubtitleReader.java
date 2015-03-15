@@ -20,12 +20,28 @@ public class SubtitleReader {
 
 	public boolean readCue(Histogram h) throws IOException {
 		String cueNumberLine = "";
-
-		// read until we find a non-blank line
-		while (cueNumberLine.trim().isEmpty()) {
-			cueNumberLine = reader.readLine();
-			if (cueNumberLine == null) {
-				return false;
+		
+		// go until we find a good line
+		boolean good = false;
+		while (!good) {
+			// read until we find a non-blank line
+			while (cueNumberLine.trim().isEmpty()) {
+				cueNumberLine = reader.readLine();
+				if (cueNumberLine == null) {
+					return false;
+				}
+			}
+			
+			if (cueNumberLine.matches("^.*-->.*$")) {
+				// read until next blank line
+				while (!cueNumberLine.trim().isEmpty()) {
+					cueNumberLine = reader.readLine();
+					if (cueNumberLine == null) {
+						return false;
+					}
+				}
+			} else {
+				good = true;
 			}
 		}
 
