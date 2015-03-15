@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.DirectoryIteratorException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -141,40 +142,57 @@ public class Main {
 				String[] entries = row.split(",");
 				
 				// IDSubtitleFile
-				// TODO set the relative path from a command line argument
-				String subtitleFilename = "eng" + File.separatorChar + entries[1];
+				// TODO set the relative path for input and output from a command line argument
+				String subtitleFilename = entries[1];
 				
 				System.out.print("Subtitle file: ");
 				System.out.println(subtitleFilename);
 				
-				histogramHelper(subtitleFilename);
+				histogramHelper(subtitleFilename, "eng", "out");
 			}
 		}	
 	}
 	
-	private static void histogramHelper(String filename) throws IOException {
+	private static void histogramHelper(String filename, String inDir, String outDir) throws IOException {
+		if (inDir == null) {
+			inDir = "";
+		} else {
+			inDir += File.separatorChar;
+		}
+		
+		if (outDir == null) {
+			outDir = "";
+		} else {
+			new File(outDir).mkdirs();
+			outDir += File.separatorChar;
+		}
+		
 		Histogram h = new Histogram();
-		InputStream s = new FileInputStream(filename);
+		InputStream s = new FileInputStream(inDir + filename);
 		BufferedReader br = new BufferedReader(new InputStreamReader(s));
 		
 		SubtitleReader subReader = new SubtitleReader(br);
 		subReader.readAllCues(h);
 		
-		FileWriter cues = new FileWriter(filename + ".cues.csv");
+		FileWriter cues = new FileWriter(outDir + filename + ".cues.csv");
 		cues.write(h.makeTimestampTable());
 		cues.close();
 		
-		FileWriter words = new FileWriter(filename + ".histo.csv");
+		FileWriter words = new FileWriter(outDir + filename + ".histo.csv");
 		words.write(h.makeHistogramTable(false));
 		words.close();
 		
-		FileWriter wordsCues = new FileWriter(filename + ".histo.cuelist.csv");
+		FileWriter wordsCues = new FileWriter(outDir + filename + ".histo.cuelist.csv");
 		wordsCues.write(h.makeHistogramTable(true));
 		wordsCues.close();
 		
-//		FileWriter all = new FileWriter(filename + ".all.csv");
+//		FileWriter all = new FileWriter(outDir + filename + ".all.csv");
 //		all.write(h.toString());
-//		all.close();
+//		all.close();		
+	}
+	
+	private static void histogramHelper(String filename) throws IOException {
+		histogramHelper(filename, null, null);
 	}
 	
 	public static void main(String[] args) throws IOException {
