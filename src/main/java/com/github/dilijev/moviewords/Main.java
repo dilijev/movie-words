@@ -145,7 +145,7 @@ public class Main {
 				// TODO set the relative path for input and output from a command line argument
 				String subtitleFilename = entries[1];
 				
-				System.out.print("Subtitle file: ");
+				System.out.print(i + ". Subtitle file: ");
 				System.out.println(subtitleFilename);
 				
 				histogramHelper(subtitleFilename, "eng", "out");

@@ -32,7 +32,11 @@ public class SubtitleReader {
 				}
 			}
 			
-			if (cueNumberLine.matches("^.*-->.*$")) {
+			if (cueNumberLine.trim().matches("^(\u00EF\u00BB\u00BF)?\\d+$")) {
+				// find a cue number on a line by itself, after a blank line or beginning of file
+				good = true;
+			}
+			else /* if (cueNumberLine.matches("^.*-->.*$")) */ {
 				// read until next blank line
 				while (!cueNumberLine.trim().isEmpty()) {
 					cueNumberLine = reader.readLine();
@@ -40,12 +44,23 @@ public class SubtitleReader {
 						return false;
 					}
 				}
-			} else {
-				good = true;
 			}
 		}
 
-		int cueNumber = Integer.parseInt(cueNumberLine.trim());
+		int cueNumber = 0;
+		try {
+			cueNumber = Integer.parseInt(cueNumberLine.trim());
+		} catch (NumberFormatException e) {
+			System.err.println("Found BOM, recovering...");
+			
+			// check whether the issue was BOM: 0xEF,0xBB,0xBF
+			String bom = String.format("%c%c%c", 0xEF, 0xBB, 0xBF);
+			if (cueNumberLine.startsWith(bom)) {
+				cueNumber = Integer.parseInt(cueNumberLine.trim().substring(bom.length()));
+			} else {
+				throw e; // give up and crash
+			}
+		}
 
 		String timeStamp = reader.readLine();
 		h.addTimeStamp(cueNumber, timeStamp); // store timestamp for later
