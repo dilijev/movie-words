@@ -1,3 +1,8 @@
+/*
+ * Author: Doug Ilijev
+ * Copyright (c) 2015: Doug Ilijev
+ */
+
 package com.github.dilijev.moviewords.subtitles;
 
 import java.io.BufferedReader;

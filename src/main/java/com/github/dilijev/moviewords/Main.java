@@ -26,7 +26,7 @@ import com.github.dilijev.moviewords.subtitles.SubtitleReader;
 import com.github.dilijev.moviewords.dictionary.Dictionary;
 
 public class Main {
-	public static void testCSV() throws FileNotFoundException {
+	private static void testCSV() throws FileNotFoundException {
 		Scanner sc = new Scanner(new File("E:\\dev\\movie-words\\source.csv"));
 		sc.nextLine(); // throw away title line
 
@@ -56,13 +56,45 @@ public class Main {
 		}
 	}
 	
-	public static void testImdbScraper() {
+	private static void testImdbScraper() {
 		System.out.println(ImdbScraper.byImdbId(137523)); // Fight Club
 		System.out.println(ImdbScraper.byImdbId(120737)); // LOTR: Fellowship
-		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) -- TODO not working (TV mode)
+		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) // TODO not working (TV mode)
 	}
 	
-	public static void histogramMode(String[] args) throws IOException {
+	private static void dictionaryMode(String[] args) throws IOException {
+		Map<String, String> opts = new HashMap<>();
+
+		// TODO check that there is at least 1 arg after 0
+		// might as well check for 2 more because of the way the interface looks 
+		
+		// 0 was the verb that got us here, start at 1
+		for (int i = 1; i < args.length; i+=2) {
+			if (args[i].startsWith("-")) {
+				String key = args[i];
+				
+				if (i < args.length + 1) {
+					String value = args[i+1];
+					opts.put(key, value);
+				} else {
+					System.err.println("No value given for option: " + key);
+				}
+			} else {
+				System.err.println("Invalid argument: " + args[i]);
+				System.exit(1);
+			}
+		}
+		
+		String dictFile = null; // -d
+		
+		if (opts.containsKey("-d")) {
+			dictFile = opts.get("-d");
+		}
+		
+		Dictionary d = new Dictionary(dictFile);
+	}
+	
+	private static void histogramMode(String[] args) throws IOException {
 		Map<String, String> opts = new HashMap<>();
 		
 		// TODO check that there is at least 1 arg after 0
@@ -142,13 +174,13 @@ public class Main {
 				String[] entries = row.split(",");
 				
 				// IDSubtitleFile
-				// TODO set the relative path for input and output from a command line argument
 				String subtitleFilename = entries[1];
 				
 				System.out.print(i + ". Subtitle file: ");
 				System.out.println(subtitleFilename);
 				
-				histogramHelper(subtitleFilename, "eng", "out");
+				// TODO set the relative path for input and output from a command line argument
+				histogramHelper(subtitleFilename, "eng", "histo");
 			}
 		}	
 	}
@@ -204,6 +236,8 @@ public class Main {
 		if (args.length >= 1) {
 			if (args[0].equals("histogram")) {
 				histogramMode(args);
+			} if (args[0].equals("dictionary")) {
+				dictionaryMode(args);	
 			} else {
 				System.err.println("Unknown mode.");
 				System.exit(1);
