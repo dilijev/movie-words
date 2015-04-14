@@ -66,13 +66,20 @@ public class Trie<T> {
 	public T get(String key) {
 		boolean endMatch = key.length() == 0 && (this.type == NodeType.EXACT || this.type == NodeType.PREFIX);
 		boolean prefixMatch = key.length() != 0 && this.type == NodeType.PREFIX;
+		boolean endNoMatch = key.length() == 0 && (this.type == NodeType.NODE || this.type == NodeType.ROOT);
 
 		if (endMatch || prefixMatch) {
 			return payload;
+		} else if (endNoMatch) {
+			return null;
 		}
 
 		char c = key.charAt(0);
 		Trie<T> child = children.get(c);
+		
+		if (child == null) {
+			return null;
+		}
 
 		return child.get(key.substring(1));
 	}

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import com.github.dilijev.moviewords.utils.BufferedReaderHelper;
@@ -20,20 +19,20 @@ public class Dictionary {
 	private BufferedReaderHelper reader;
 	private ReaderState state;
 
-	private HashMap<Integer, String> categoryMap;
-	private Trie<ArrayList<Integer>> wordMap;
+	private HashMap<Integer, CategoryInfo> categoryInfo;
+	private Trie<ArrayList<Integer>> wordSet;
 
 	public Dictionary(String dictFile) throws IOException {
 		InputStream s = new FileInputStream(dictFile);
 		reader = new BufferedReaderHelper(new BufferedReader(new InputStreamReader(s)));
 		state = ReaderState.START;
-		categoryMap = new HashMap<>();
-		wordMap = new Trie<>();
+		categoryInfo = new HashMap<>();
+		wordSet = new Trie<>();
 
 		readAllDictionary();
 
-		System.out.println(categoryMap);
-		System.out.println(wordMap);
+		// System.out.println(categoryMap);
+		// System.out.println(wordMap);
 
 		// ArrayList<Integer> list = wordMap.get("abandon");
 		// ArrayList<Integer> list1 = wordMap.get("abandonment");
@@ -41,6 +40,22 @@ public class Dictionary {
 		// System.out.println(list);
 		// System.out.println(list1);
 		// System.out.println(list2);
+	}
+	
+	public void analyzeWord(String word, int count) {
+		ArrayList<Integer> categories = wordSet.get(word);
+		if (categories == null) {
+			return; // nothing to add
+		}
+		
+		for (int c : categories) {
+			CategoryInfo info = categoryInfo.get(c);
+			info.incrementCount(count);
+		}
+	}
+	
+	public HashMap<Integer, CategoryInfo> getCategoryInfo() {
+		return this.categoryInfo;
 	}
 
 	private void readAllDictionary() throws IOException {
@@ -51,8 +66,7 @@ public class Dictionary {
 				break;
 			}
 
-			System.out.println(line);
-
+			// System.out.println(line);
 			processLine(line);
 		}
 	}
@@ -99,13 +113,13 @@ public class Dictionary {
 			System.exit(1);
 		}
 
-		categoryMap.put(Integer.parseInt(a[0]), a[1]);
+		categoryInfo.put(Integer.parseInt(a[0]), new CategoryInfo(a[1]));
 	}
 
 	private void processWordLine(String line) {
 		String[] a = line.split("\\s+");
 
-		System.out.println(Arrays.toString(a));
+		// System.out.println(Arrays.toString(a));
 
 		// word lines can contain a word and any number of number tokens
 		if (a.length < 2) {
@@ -138,7 +152,7 @@ public class Dictionary {
 			numlist.add(Integer.parseInt(a[i]));
 		}
 
-		wordMap.insert(word, isPrefix, numlist);
+		wordSet.insert(word, isPrefix, numlist);
 	}
 
 	private enum ReaderState {
