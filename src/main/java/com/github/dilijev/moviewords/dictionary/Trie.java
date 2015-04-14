@@ -18,18 +18,23 @@ public class Trie<T> {
 	private HashMap<Character, Trie<T>> children;
 
 	public Trie() {
-		type = NodeType.NODE;
+		type = NodeType.ROOT;
 		c = 0; // null character
 		payload = null; // the root node doesn't have a payload
 
 		children = new HashMap<>();
 	}
 
+	public Trie(NodeType type) {
+		this();
+		this.type = type;
+	}
+
 	private Trie<T> getOrCreateNode(char c) {
 		if (children.containsKey(c)) {
 			return children.get(c);
 		} else {
-			Trie<T> node = new Trie<T>();
+			Trie<T> node = new Trie<T>(NodeType.NODE);
 			node.c = c;
 
 			children.put(c, node);
@@ -102,6 +107,6 @@ public class Trie<T> {
 	}
 
 	private enum NodeType {
-		NODE, ROOT, PREFIX, EXACT
+		ROOT, NODE, PREFIX, EXACT
 	}
 }
