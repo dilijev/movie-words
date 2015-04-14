@@ -1,3 +1,8 @@
+/*
+ * Author: Doug Ilijev
+ * Copyright (c) 2015: Doug Ilijev
+ */
+
 package com.github.dilijev.moviewords.dictionary;
 
 import java.util.ArrayList;
@@ -26,7 +31,7 @@ public class Trie<T> {
 		} else {
 			Trie<T> node = new Trie<T>();
 			node.c = c;
-			
+
 			children.put(c, node);
 			return node;
 		}
@@ -35,7 +40,7 @@ public class Trie<T> {
 	public void insert(String word, boolean isPrefix, T payload) {
 		insertHelper(word.toLowerCase(), isPrefix, payload);
 	}
-	
+
 	private void insertHelper(String word, boolean isPrefix, T payload) {
 		if (word.length() == 0) {
 			if (isPrefix) {
@@ -54,16 +59,19 @@ public class Trie<T> {
 	}
 
 	public T get(String key) {
-		if (key.length() == 0 && (this.type == NodeType.EXACT || this.type == NodeType.PREFIX)) {
+		boolean endMatch = key.length() == 0 && (this.type == NodeType.EXACT || this.type == NodeType.PREFIX);
+		boolean prefixMatch = key.length() != 0 && this.type == NodeType.PREFIX;
+
+		if (endMatch || prefixMatch) {
 			return payload;
 		}
-		
+
 		char c = key.charAt(0);
-		// TODO finish implementation
-		
-		return null;
+		Trie<T> child = children.get(c);
+
+		return child.get(key.substring(1));
 	}
-	
+
 	private void getAllStrings(Collection<String> list, String prefix) {
 		if (type != NodeType.ROOT) {
 			prefix = prefix + c;

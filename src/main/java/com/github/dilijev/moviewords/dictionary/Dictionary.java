@@ -34,9 +34,13 @@ public class Dictionary {
 
 		System.out.println(categoryMap);
 		System.out.println(wordMap);
-		
-		ArrayList<Integer> list = wordMap.get("abandonment");
-		System.out.println(list);
+
+		// ArrayList<Integer> list = wordMap.get("abandon");
+		// ArrayList<Integer> list1 = wordMap.get("abandonment");
+		// ArrayList<Integer> list2 = wordMap.get("killed");
+		// System.out.println(list);
+		// System.out.println(list1);
+		// System.out.println(list2);
 	}
 
 	private void readAllDictionary() throws IOException {
