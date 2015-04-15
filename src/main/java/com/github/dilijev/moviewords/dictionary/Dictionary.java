@@ -10,12 +10,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 import com.github.dilijev.moviewords.utils.BufferedReaderHelper;
 
 public class Dictionary {
+	private static DecimalFormat df = new DecimalFormat(".######");
+	static {
+		df.setRoundingMode(RoundingMode.HALF_UP);
+	}
+
 	private BufferedReaderHelper reader;
 	private ReaderState state;
 
@@ -171,11 +178,11 @@ public class Dictionary {
 
 	public String getHeaderString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Total Words,");
+		sb.append("TotalWords,");
 
 		for (CategoryInfo info : categoryInfo.values()) {
 			String name = info.getName();
-			sb.append(name).append(",").append(name).append("-ratio");
+			sb.append(name).append(",").append(name).append("-ratio").append(",");
 		}
 
 		return sb.toString();
@@ -190,7 +197,7 @@ public class Dictionary {
 			sb.append(count).append(",");
 
 			double ratio = 1.0 * count / totalWords;
-			String ratioValue = String.format("%.6f", ratio);
+			String ratioValue = df.format(ratio);
 			sb.append(ratioValue).append(",");
 		}
 

@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.github.dilijev.moviewords.dictionary.CategoryInfo;
 import com.github.dilijev.moviewords.dictionary.Dictionary;
 import com.github.dilijev.moviewords.imdb.ImdbScraper;
 import com.github.dilijev.moviewords.subtitles.Histogram;
@@ -117,6 +116,7 @@ public class Main {
 		System.out.println("Output file: " + outFile);
 		System.out.println("Begin: " + begin);
 		System.out.println("End: " + end);
+		System.out.println();
 
 		if (dictFile == null || sourceFile == null) {
 			System.err.println("Must specify both -d or -f in dictionary analysis mode.");
@@ -126,20 +126,20 @@ public class Main {
 		Dictionary dict = new Dictionary(dictFile);
 
 		// use the rest of the settings for a batch job
-		InputStream s = new FileInputStream(sourceFile);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(s));
+		BufferedReader sourceFileReader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile)));
+		FileWriter outputFileWriter = new FileWriter(outFile);
 
-		String headers = reader.readLine();
+		String headers = sourceFileReader.readLine();
 
-		// TODO write all headers to file
-		System.out.print(headers);
-		System.out.print(","); // extra comma
-		System.out.print(dict.getHeaderString());
-		System.out.println();
+		// write all headers to file
+		outputFileWriter.write(headers);
+		outputFileWriter.write(","); // extra comma
+		outputFileWriter.write(dict.getHeaderString());
+		outputFileWriter.write("\n");
 
 		// just read up to the lines we care about (starting at line <begin>)
 		for (int i = 0; i < begin; i++) {
-			String line = reader.readLine();
+			String line = sourceFileReader.readLine();
 			if (line == null) {
 				break;
 			}
@@ -147,33 +147,33 @@ public class Main {
 
 		// read lines [begin..end)
 		for (int i = begin; (end == 0) ? true : (i < end); i++) {
-			String row = reader.readLine();
+			String row = sourceFileReader.readLine();
 			if (row == null) {
 				break;
 			}
 
 			// TODO set the relative path for input
-			dictionaryHelper(dict, i, row, histoDirectory);
+			dictionaryHelper(dict, i, row, histoDirectory, outputFileWriter);
 		}
 
-		reader.close();
+		sourceFileReader.close();
+		outputFileWriter.close();
 	}
 
-	private static void dictionaryHelper(Dictionary dict, int index, String row, String histoDirectory)
-			throws IOException {
+	private static void dictionaryHelper(Dictionary dict, int index, String row, String histoDirectory,
+			FileWriter outputFileWriter) throws IOException {
 		dict.resetCounts();
 
 		String[] entries = row.split(",");
 
-		// IDSubtitleFile
-		String baseFilename = entries[1];
+		String baseFilename = entries[1]; // IDSubtitleFile
 
 		System.out.print(index + ". Base filename: ");
 		System.out.println(baseFilename);
 
-		// TODO write the data currently in the row to the file
-		System.out.print(row);
-		System.out.print(",");
+		// write the data currently in the row to the file
+		outputFileWriter.write(row);
+		outputFileWriter.write(",");
 
 		String histoPath = histoDirectory + File.separator + baseFilename + ".histo.csv";
 
@@ -181,6 +181,7 @@ public class Main {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(s));
 
 		reader.readLine(); // ignore the first line (headers)
+
 		String totalsRow = reader.readLine();
 		String[] totals = totalsRow.split(",");
 		int totalWords = Integer.parseInt(totals[1]);
@@ -201,8 +202,9 @@ public class Main {
 			dict.analyzeWord(word, count);
 		}
 
-		// TODO write the values from the analysis to the output file
-		System.out.println(dict.getValueString());
+		// write the values from the analysis to the output file
+		outputFileWriter.write(dict.getValueString());
+		outputFileWriter.write("\n");
 
 		reader.close();
 	}
