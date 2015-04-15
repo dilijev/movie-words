@@ -58,9 +58,7 @@ public class Main {
 	private static void testImdbScraper() {
 		System.out.println(ImdbScraper.byImdbId(137523)); // Fight Club
 		System.out.println(ImdbScraper.byImdbId(120737)); // LOTR: Fellowship
-		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) //
-															// TODO not working
-															// (TV mode)
+		System.out.println(ImdbScraper.byImdbId(2702698)); // Sherlock (TV) // TODO not working (TV mode)
 	}
 
 	private static void dictionaryMode(String[] args) throws IOException {
@@ -89,9 +87,9 @@ public class Main {
 		String dictFile = null; // -d
 		String sourceFile = null; // -s
 		String histoDirectory = "histo"; // -h
+		String outFile = "dict_analysis.csv"; // -o
 		int begin = 0; // -b : default 0 start at the beginning
-		int end = 0; // -e : default 0 do the whole file, otherwise stop on this
-						// line
+		int end = 0; // -e : default 0 do the whole file, otherwise stop on this line
 
 		if (opts.containsKey("-d")) {
 			dictFile = opts.get("-d");
@@ -101,6 +99,9 @@ public class Main {
 		}
 		if (opts.containsKey("-h")) {
 			histoDirectory = opts.get("-h");
+		}
+		if (opts.containsKey("-o")) {
+			outFile = opts.get("-o");
 		}
 		if (opts.containsKey("-b")) {
 			begin = Integer.parseInt(opts.get("-b"));
@@ -113,6 +114,7 @@ public class Main {
 		System.out.println("Dictionary: " + dictFile);
 		System.out.println("Source file: " + sourceFile);
 		System.out.println("Histogram directory: " + histoDirectory);
+		System.out.println("Output file: " + outFile);
 		System.out.println("Begin: " + begin);
 		System.out.println("End: " + end);
 
@@ -127,7 +129,13 @@ public class Main {
 		InputStream s = new FileInputStream(sourceFile);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(s));
 
-		reader.readLine(); // skip the headers
+		String headers = reader.readLine();
+
+		// TODO write all headers to file
+		System.out.print(headers);
+		System.out.print(","); // extra comma
+		System.out.print(dict.getHeaderString());
+		System.out.println();
 
 		// just read up to the lines we care about (starting at line <begin>)
 		for (int i = 0; i < begin; i++) {
@@ -153,6 +161,8 @@ public class Main {
 
 	private static void dictionaryHelper(Dictionary dict, int index, String row, String histoDirectory)
 			throws IOException {
+		dict.resetCounts();
+
 		String[] entries = row.split(",");
 
 		// IDSubtitleFile
@@ -160,6 +170,10 @@ public class Main {
 
 		System.out.print(index + ". Base filename: ");
 		System.out.println(baseFilename);
+
+		// TODO write the data currently in the row to the file
+		System.out.print(row);
+		System.out.print(",");
 
 		String histoPath = histoDirectory + File.separator + baseFilename + ".histo.csv";
 
@@ -170,6 +184,7 @@ public class Main {
 		String totalsRow = reader.readLine();
 		String[] totals = totalsRow.split(",");
 		int totalWords = Integer.parseInt(totals[1]);
+		dict.setTotalWords(totalWords);
 
 		reader.readLine(); // ignore the third line (headers for histogram)
 
@@ -186,11 +201,8 @@ public class Main {
 			dict.analyzeWord(word, count);
 		}
 
-		HashMap<Integer, CategoryInfo> categoryInfo = dict.getCategoryInfo();
-
-		// TODO remove
-		System.out.printf("Total Words: %d\n", totalWords);
-		System.out.println(categoryInfo);
+		// TODO write the values from the analysis to the output file
+		System.out.println(dict.getValueString());
 
 		reader.close();
 	}

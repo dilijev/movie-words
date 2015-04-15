@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import com.github.dilijev.moviewords.utils.BufferedReaderHelper;
 
@@ -19,14 +19,16 @@ public class Dictionary {
 	private BufferedReaderHelper reader;
 	private ReaderState state;
 
-	private HashMap<Integer, CategoryInfo> categoryInfo;
+	private TreeMap<Integer, CategoryInfo> categoryInfo;
 	private Trie<ArrayList<Integer>> wordSet;
+
+	private int totalWords;
 
 	public Dictionary(String dictFile) throws IOException {
 		InputStream s = new FileInputStream(dictFile);
 		reader = new BufferedReaderHelper(new BufferedReader(new InputStreamReader(s)));
 		state = ReaderState.START;
-		categoryInfo = new HashMap<>();
+		categoryInfo = new TreeMap<>();
 		wordSet = new Trie<>();
 
 		readAllDictionary();
@@ -41,20 +43,32 @@ public class Dictionary {
 		// System.out.println(list1);
 		// System.out.println(list2);
 	}
-	
+
+	public void resetCounts() {
+		for (CategoryInfo info : categoryInfo.values()) {
+			info.resetCount();
+		}
+
+		this.totalWords = 0;
+	}
+
+	public void setTotalWords(int totalWords) {
+		this.totalWords = totalWords;
+	}
+
 	public void analyzeWord(String word, int count) {
 		ArrayList<Integer> categories = wordSet.get(word);
 		if (categories == null) {
 			return; // nothing to add
 		}
-		
+
 		for (int c : categories) {
 			CategoryInfo info = categoryInfo.get(c);
 			info.incrementCount(count);
 		}
 	}
-	
-	public HashMap<Integer, CategoryInfo> getCategoryInfo() {
+
+	public TreeMap<Integer, CategoryInfo> getCategoryInfo() {
 		return this.categoryInfo;
 	}
 
@@ -153,6 +167,34 @@ public class Dictionary {
 		}
 
 		wordSet.insert(word, isPrefix, numlist);
+	}
+
+	public String getHeaderString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Total Words,");
+
+		for (CategoryInfo info : categoryInfo.values()) {
+			String name = info.getName();
+			sb.append(name).append(",").append(name).append("-ratio");
+		}
+
+		return sb.toString();
+	}
+
+	public String getValueString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(totalWords).append(",");
+
+		for (CategoryInfo info : categoryInfo.values()) {
+			int count = info.getCount();
+			sb.append(count).append(",");
+
+			double ratio = 1.0 * count / totalWords;
+			String ratioValue = String.format("%.6f", ratio);
+			sb.append(ratioValue).append(",");
+		}
+
+		return sb.toString();
 	}
 
 	private enum ReaderState {
