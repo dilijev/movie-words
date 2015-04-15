@@ -63,8 +63,12 @@ public class Main {
 	private static void dictionaryMode(String[] args) throws IOException {
 		Map<String, String> opts = new HashMap<>();
 
-		// TODO check that there is at least 1 arg after 0
-		// might as well check for 2 more because of the way the interface looks
+		if (!(args.length >= 3)) {
+			System.err.println("Incorrect usage");
+			System.err.println("    dictionary -d DICTFILE -s SOURCEFILE [-h HISTO_DIRECTORY|histo] "
+					+ "[-o OUTFILE|dict.csv] [-b BEGIN|0] [-e END|0]");
+			System.exit(1);
+		}
 
 		// 0 was the verb that got us here, start at 1
 		for (int i = 1; i < args.length; i += 2) {
@@ -86,7 +90,7 @@ public class Main {
 		String dictFile = null; // -d
 		String sourceFile = null; // -s
 		String histoDirectory = "histo"; // -h
-		String outFile = "dict_analysis.csv"; // -o
+		String outFile = "dict.csv"; // -o
 		int begin = 0; // -b : default 0 start at the beginning
 		int end = 0; // -e : default 0 do the whole file, otherwise stop on this line
 
@@ -212,8 +216,11 @@ public class Main {
 	private static void histogramMode(String[] args) throws IOException {
 		Map<String, String> opts = new HashMap<>();
 
-		// TODO check that there is at least 1 arg after 0
-		// might as well check for 2 more because of the way the interface looks
+		if (!(args.length >= 3)) {
+			System.err.println("Incorrect usage");
+			System.err.println("    histogram (-f FILENAME | -s SOURCEFILE) [-b BEGIN|0] [-e END|0]");
+			System.exit(1);
+		}
 
 		// 0 was the verb that got us here, start at 1
 		for (int i = 1; i < args.length; i += 2) {
@@ -235,8 +242,7 @@ public class Main {
 		String filename = null; // -f
 		String sourceFile = null; // -s
 		int begin = 0; // -b : default 0 start at the beginning
-		int end = 0; // -e : default 0 do the whole file, otherwise stop on this
-						// line
+		int end = 0; // -e : default 0 do the whole file, otherwise stop on this line
 
 		if (opts.containsKey("-s")) {
 			sourceFile = opts.get("-s");
@@ -367,7 +373,7 @@ public class Main {
 	}
 
 	public static void usage() {
-		System.err.println("Wrong number of arguments.");
+		System.err.println("Wrong number of arguments. Specify a verb (histogram, dictionary) and arguments.");
 		System.exit(1);
 	}
 }
