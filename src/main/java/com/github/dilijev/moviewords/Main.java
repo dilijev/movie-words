@@ -123,7 +123,7 @@ public class Main {
 		System.out.println();
 
 		if (dictFile == null || sourceFile == null) {
-			System.err.println("Must specify both -d or -f in dictionary analysis mode.");
+			System.err.println("Must specify both -d and -s in dictionary analysis mode.");
 			System.exit(1);
 		}
 

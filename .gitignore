@@ -16,6 +16,7 @@ bin/*
 ~*
 .DS_Store
 *.orig
+*.swp
 
 # maven-generated
 
